@@ -1,0 +1,98 @@
+buildscript {
+  repositories { 
+    jcenter() 
+  }
+  dependencies {
+    classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.2.3'
+    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
+  }
+}
+
+apply plugin: 'groovy'
+apply plugin: 'java-gradle-plugin'
+apply plugin: 'idea'
+apply plugin: 'artifactory'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: 'artifactory'
+apply plugin: 'com.jfrog.bintray'
+
+repositories {
+  jcenter()
+}
+
+group = "com.github.danveloper"
+version = "1.0.0"
+
+dependencies {
+  compile 'org.python:jython-standalone:2.7.0'
+  compile gradleApi()
+  testCompile gradleTestKit()
+  testCompile("org.spockframework:spock-core:1.0-groovy-2.4") {
+    exclude module: 'groovy-all'
+  }
+}
+
+artifactory {
+  contextUrl = 'http://oss.jfrog.org'
+}
+
+ext.isSnapshot = version.endsWith('-SNAPSHOT')
+
+artifactoryPublish { task ->
+  rootProject.artifactory {
+    publish {
+      repository {
+        repoKey = isSnapshot ? 'oss-snapshot-local' : 'oss-release-local'
+        gradle.taskGraph.whenReady { taskGraph ->
+          if (taskGraph.hasTask(task)) {
+            username = bintrayUser
+            password = bintrayKey
+          }
+        }
+      }
+    }
+  }
+}
+
+task sourceJar(type: Jar) {
+  classifier "sources"
+  from sourceSets.main.allJava
+}
+
+publishing {
+  publications {
+    maven(MavenPublication) {
+      from components.java
+      artifact sourceJar
+    }
+
+  }
+}
+
+bintrayUpload { task ->
+  doFirst {
+    if (isSnapshot) {
+      throw new GradleException('Cannot publish SNAPSHOT versions to BinTray!')
+    }
+  }
+  gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.hasTask(task)) {
+      task.user = bintrayUser
+      task.apiKey = bintrayKey
+    }
+  }
+}
+
+bintray {
+  publications = ['maven']
+  publish = true
+  dryRun = false
+  pkg {
+    name = "gradle-py"
+    userOrg = "danveloper"
+    repo = 'maven'
+    licenses = ['WTFPL']
+    labels = ['gradle', 'javascript']
+  }
+}

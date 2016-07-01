@@ -1,0 +1,100 @@
+= Gradle Python Buildscript Plugin
+
+Python fuckin' rules, everyone knows that. And Gradle is the best fuckin' build system ever fuckin' created. I don't say that lightly... Its use of functional programming interfaces in defining the contract to the specification that is used to compose the build script makes it an awesome fuckin' utility for plugging multiple languages on top of it.
+
+https://github.com/danveloper/gradle-js[I already fuckin' did JavaScript.]
+
+== But, how?
+
+Easy as fuck.
+
+ - You still need a `build.gradle` file in your project root (for now).
+
+.But it only needs this.
+====
+[source,groovy]
+----
+buildscript {
+  repositories { jcenter() }
+  dependencies { classpath 'com.danveloper.github:gradle-py:1.0.0' }
+}
+apply plugin: 'py-build'
+----
+====
+
+Boom that's it. (Or will be if I ever publish this anywhere LMAO!!!)
+
+== Then what?
+
+Python the fuck out of your project.
+
+ - You need a `gradle.py` file in your project root.
+
+.Short as fuck, amirite
+====
+[source,python]
+----
+project.apply({'plugin': 'groovy'}); // <1>
+project.apply({'plugin': 'maven'});
+
+project.repositories(lambda repos: repos.mavenCentral()) // <2>
+project.dependencies(lambda deps : deps.compile('com.wtfamidoing:somedep:semver')) // <3>
+
+def printf(x):
+  print x
+
+project.task('myFuckinTask', lambda task:
+  task.action(lambda t: printf("myFuckinTask worked!"))) // <4>
+----
+====
+
+<1> Throw some fuckin' Gradle plugins into your buildscript. Don't fuckin' matter which ones!
+<2> Get some JAVA repos up in this build yo. Heard you like Maven Central LMAO!!!
+<3> You like JAVA dependencies, don't you. Here you fuckin' go.
+<4> Yo dawg, I heard you like tasks. Write them with fuckin' lambda functions! (Note: lambdas require a statement, so we simply source `printf` => `print` here)
+
+== But then what?
+
+Just run that shit.
+
+.Run that shit.
+====
+[source,text]
+----
+$ ./gradlew myFuckin
+:compileJava UP-TO-DATE
+:compileGroovy UP-TO-DATE
+:processResources UP-TO-DATE
+:classes UP-TO-DATE
+:compileTestJava UP-TO-DATE
+:compileTestGroovy UP-TO-DATE
+:myFuckinTask
+myFuckinTask worked!
+
+BUILD SUCCESSFUL
+
+Total time: 31.306 secs
+
+This build could be faster, please consider using the Gradle Daemon: https://docs.gradle.org/2.14/userguide/gradle_daemon.html
+
+$
+----
+====
+
+There you go.
+
+== Is this for real?
+
+Fuck yes it is. Go look at the fucking tests.
+
+== License?
+
+I don't know. Just take it, who cares.
+
+== Authors
+
+https://twitter.com/danveloper[@danveloper]
+
+== When?
+
+JULY FIRST, TWO THOUSAND AND SIXTEEN
