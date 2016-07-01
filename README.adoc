@@ -61,7 +61,7 @@ Just run that shit.
 ====
 [source,text]
 ----
-$ ./gradlew myFuckin
+$ ./gradlew myFuckinTask
 :compileJava UP-TO-DATE
 :compileGroovy UP-TO-DATE
 :processResources UP-TO-DATE
